@@ -3,25 +3,26 @@
 Terraform module to create a Client VPN enpoint inside your VPC
 
 
-### tfenv setup
+## Usage
 
-Set the terraform version with tfenv, before launch pre-commit to avoid errors
+```hcl
+module "vpn" {
+  source                     = "git::https://github.com/pagopa/terraform-aws-client-vpn-endpoint.git?ref=v1.0.0"
+  endpoint_name              = "vpn"
+  endpoint_client_cidr_block = "10.100.0.0/22"
+  endpoint_subnets           = [module.vpc.private_subnets[0]] # Attach VPN to single subnet. Reduce cost
+  endpoint_vpc_id            = module.vpc.vpc_id
+  tls_subject_common_name    = "vpn.sandbox.pagopa.it"
+  saml_provider_arn          = aws_iam_saml_provider.vpn.arn
 
-```bash
-tfenv use <x.y.x>
+  authorization_rules = {}
+
+  authorization_rules_all_groups = {
+    full_access_private_subnet_0 = module.vpc.private_subnets_cidr_blocks[0]
+  }
+}
 ```
 
-### Run pre-commit on local machine
-
-Check your code before commit.
-
-<https://github.com/antonbabenko/pre-commit-terraform#how-to-install>
-
-```sh
-# for terraform modules we need to initialize them with
-bash .utils/terraform_run_all.sh init local
-pre-commit run -a
-```
 
 <!-- BEGIN_TF_DOCS -->
 <!-- END_TF_DOCS -->
