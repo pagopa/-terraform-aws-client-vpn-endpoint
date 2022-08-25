@@ -64,4 +64,9 @@ module "vpn" {
     full_access_private_subnet_0 = module.vpc.private_subnets_cidr_blocks[0]
   }
 
+
+  depends_on = [
+    module.vpc
+  ]
+
 }
