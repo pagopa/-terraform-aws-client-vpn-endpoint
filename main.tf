@@ -84,9 +84,9 @@ resource "aws_ec2_client_vpn_endpoint" "this" {
 }
 
 resource "aws_ec2_client_vpn_network_association" "this" {
-  for_each               = toset(var.endpoint_subnets)
+  count                  = length(var.endpoint_subnets)
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.this.id
-  subnet_id              = each.value
+  subnet_id              = element(var.endpoint_subnets, count.index)
 }
 
 resource "aws_ec2_client_vpn_authorization_rule" "sso_to_dns" {
