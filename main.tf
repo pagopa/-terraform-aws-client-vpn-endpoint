@@ -49,6 +49,14 @@ resource "aws_security_group" "this" {
   name        = format("client-vpn-endpoint-%s", var.endpoint_name)
   description = "Egress All. Used for other groups where VPN access is required. "
   vpc_id      = var.endpoint_vpc_id
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -67,9 +75,20 @@ resource "aws_ec2_client_vpn_endpoint" "this" {
   dns_servers            = var.use_vpc_internal_dns ? [cidrhost(data.aws_vpc.this.cidr_block, 2)] : var.dns_servers
   security_group_ids     = [aws_security_group.this.id]
 
-  authentication_options {
-    type              = "federated-authentication"
-    saml_provider_arn = var.saml_provider_arn
+  dynamic "authentication_options" {
+    for_each = var.saml_provider_arn == null ? [] : [true]
+    content {
+      type              = "federated-authentication"
+      saml_provider_arn = var.saml_provider_arn
+    }
+  }
+
+  dynamic "authentication_options" {
+    for_each = var.client_root_certificate_arn == null ? [] : [true]
+    content {
+      type                       = "certificate-authentication"
+      root_certificate_chain_arn = var.client_root_certificate_arn
+    }
   }
 
   connection_log_options {

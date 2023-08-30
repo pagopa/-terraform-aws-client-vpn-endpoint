@@ -28,6 +28,7 @@ variable "certificate_arn" {
 variable "tls_subject_common_name" {
   description = "The common_name for subject for which a certificate is being requested. RFC5280. Not used if certificate_arn provided."
   type        = string
+  default = null
 }
 
 variable "tls_validity_period_hours" {
@@ -70,6 +71,13 @@ variable "dns_servers" {
 variable "saml_provider_arn" {
   description = "The ARN of the IAM SAML identity provider."
   type        = string
+  default = null
+}
+
+variable "client_root_certificate_arn" {
+  description = "The ARN of the ACM Client Certificate for enabling mutual authentication (certificate-authentication)"
+  type        = string
+  default = null
 }
 
 variable "authorization_rules" {
